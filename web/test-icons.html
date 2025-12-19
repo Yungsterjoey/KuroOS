@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Icon Test</title>
+<style>
+body{background:#0a0010;margin:0;padding:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;align-items:center;min-height:100vh;font-family:system-ui;color:#fff;}
+.icon-box{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.icon-box span{font-size:11px;opacity:0.6;}
+</style>
+</head>
+<body>
+<div class="icon-box"><div id="i1"></div><span>keyboard</span></div>
+<div class="icon-box"><div id="i2"></div><span>terminal</span></div>
+<div class="icon-box"><div id="i3"></div><span>expand</span></div>
+<div class="icon-box"><div id="i4"></div><span>refresh</span></div>
+<div class="icon-box"><div id="i5"></div><span>home</span></div>
+<div class="icon-box"><div id="i6"></div><span>cube</span></div>
+<script type="module">
+import{EtchedIcon}from'/shared/glass-cube.js';
+new EtchedIcon(document.getElementById('i1'),'keyboard',60);
+new EtchedIcon(document.getElementById('i2'),'terminal',60);
+new EtchedIcon(document.getElementById('i3'),'expand',60);
+new EtchedIcon(document.getElementById('i4'),'refresh',60);
+new EtchedIcon(document.getElementById('i5'),'home',60);
+new EtchedIcon(document.getElementById('i6'),'cube',100);
+</script>
+</body>
+</html>

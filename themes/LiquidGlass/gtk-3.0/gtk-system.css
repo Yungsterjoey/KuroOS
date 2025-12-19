@@ -1,0 +1,43 @@
+@define-color bg_color #0a0010;
+@define-color fg_color #ffffff;
+@define-color base_color #1a0030;
+@define-color selected_bg_color #a78bfa;
+@define-color selected_fg_color #ffffff;
+@define-color borders #3d2a5c;
+
+* {
+    background-color: @bg_color;
+    color: @fg_color;
+    border-color: @borders;
+    border-radius: 12px;
+}
+
+window {
+    background-color: alpha(@base_color, 0.85);
+    border: 1px solid @borders;
+    border-radius: 16px;
+}
+
+button {
+    background: linear-gradient(180deg, alpha(#ffffff, 0.15), alpha(#ffffff, 0.05));
+    border: 1px solid alpha(#ffffff, 0.3);
+    border-radius: 10px;
+    padding: 8px 16px;
+}
+
+button:hover {
+    background: linear-gradient(180deg, alpha(#ffffff, 0.25), alpha(#ffffff, 0.1));
+}
+
+entry {
+    background: alpha(@base_color, 0.6);
+    border: 1px solid @borders;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+headerbar {
+    background: linear-gradient(180deg, alpha(#ffffff, 0.12), alpha(#ffffff, 0.05));
+    border-bottom: 1px solid @borders;
+    border-radius: 16px 16px 0 0;
+}

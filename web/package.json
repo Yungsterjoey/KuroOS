@@ -1,0 +1,11 @@
+{
+  "name": "kuro-main",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "http-proxy-middleware": "^2.0.9"
+  }
+}

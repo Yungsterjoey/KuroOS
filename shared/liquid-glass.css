@@ -1,0 +1,37 @@
+/* KURO LIQUID GLASS SYSTEM - DO NOT MODIFY */
+/* Based on Apple iOS 26 Liquid Glass */
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.025);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-highlight-top: rgba(255, 255, 255, 0.2);
+  --glass-highlight-side: rgba(255, 255, 255, 0.08);
+  --glass-highlight-bottom: rgba(255, 255, 255, 0.06);
+  --glass-blur: 40px;
+  --glass-saturation: 180%;
+  
+  --btn-glass-bg: rgba(20, 20, 25, 0.4);
+  --btn-primary-bg: rgba(139, 92, 246, 0.5);
+  
+  --dropdown-bg: rgba(20, 20, 25, 0.85);
+  
+  --ice-light: rgba(220, 240, 255, 0.85);
+  --ice-highlight: rgba(255, 255, 255, 0.95);
+  --ice-dark: rgba(180, 210, 240, 0.7);
+  --ice-inverted-base: rgba(20, 35, 50, 0.8);
+  
+  --cube-purple: rgba(140, 80, 200, 0.25);
+}
+
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
+  border: 1.5px solid var(--glass-border);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 var(--glass-highlight-top),
+    inset 0 -1px 0 var(--glass-highlight-bottom),
+    inset 1px 0 0 var(--glass-highlight-side),
+    inset -1px 0 0 var(--glass-highlight-side);
+}

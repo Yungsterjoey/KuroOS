@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>KuroMiru</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      background: #0a0010;
+      color: #fff;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: fixed;
+      inset: 0;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+    }
+    #app { height: 100%; display: flex; flex-direction: column; }
+    .header {
+      padding: 8px 12px;
+      background: rgba(10, 0, 16, 0.95);
+      border-bottom: 1px solid rgba(140, 80, 200, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 100;
+      height: 44px;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; }
+    .logo-text { font-size: 15px; font-weight: 600; color: #a78bfa; }
+    .header-cube { width: 28px; height: 28px; }
+    .status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.5); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #666; transition: all 0.3s; }
+    .status-dot.connected { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
+    #screen-wrap { flex: 1; position: relative; overflow: hidden; background: #000; }
+    #screen { position: absolute; inset: 0; }
+    #cursor {
+      position: absolute;
+      width: 28px; height: 28px;
+      pointer-events: none;
+      z-index: 50;
+      transform: translate(-50%, -50%);
+      display: none;
+    }
+    #cursor.visible { display: block; }
+    #cursor-glass {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.1) 100%);
+      border: 0.5px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .click-ripple {
+      position: absolute;
+      width: 50px; height: 50px;
+      background: radial-gradient(circle, rgba(168,85,247,0.4) 0%, transparent 70%);
+      border: 1.5px solid rgba(168,85,247,0.5);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      animation: ripple 0.5s ease-out forwards;
+      pointer-events: none;
+      z-index: 49;
+    }
+    @keyframes ripple { to { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+    .toolbar {
+      padding: 8px;
+      padding-bottom: calc(8px + env(safe-area-inset-bottom));
+      background: rgba(10, 0, 16, 0.95);
+      border-top: 1px solid rgba(140, 80, 200, 0.25);
+      display: flex;
+      justify-content: space-around;
+      gap: 4px;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .tool-btn {
+      padding: 4px;
+      background: transparent;
+      border: none;
+      color: #a78bfa;
+      font-size: 9px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+      text-decoration: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tool-btn:active { opacity: 0.6; transform: scale(0.95); }
+    .tool-icon { width: 32px; height: 32px; }
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(8, 4, 20, 0.99) 0%, rgba(15, 8, 35, 0.99) 50%, rgba(8, 4, 20, 0.99) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.4s;
+    }
+    .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+    #loading-cube { width: 140px; height: 140px; margin-bottom: 28px; display: flex; align-items: center; justify-content: center; }
+    .loading-text { font-size: 18px; font-weight: 600; color: #a78bfa; }
+    .loading-sub { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 6px; }
+    .quick-keys {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10, 0, 16, 0.98);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(140, 80, 200, 0.4);
+      border-radius: 16px;
+      padding: 12px;
+      display: none;
+      gap: 8px;
+      z-index: 150;
+      flex-wrap: wrap;
+      max-width: 320px;
+      justify-content: center;
+    }
+    .quick-keys.visible { display: flex; }
+    .qk-btn {
+      padding: 12px 16px;
+      background: rgba(140, 80, 200, 0.15);
+      border: 1px solid rgba(140, 80, 200, 0.3);
+      border-radius: 10px;
+      color: #e0d0ff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .qk-btn:active { background: rgba(140, 80, 200, 0.4); }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="logo">
+        <div class="header-cube" id="header-cube"></div>
+        <span class="logo-text">KuroMiru</span>
+      </div>
+      <div class="status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Connecting</span>
+      </div>
+    </div>
+    <div id="screen-wrap">
+      <div id="screen"></div>
+      <div id="cursor"><div id="cursor-glass"></div></div>
+    </div>
+    <div class="toolbar">
+      <button class="tool-btn" onclick="toggleKeys()"><div class="tool-icon" id="icon-keys"></div><span>Keys</span></button>
+      <button class="tool-btn" onclick="sendCtrlAltT()"><div class="tool-icon" id="icon-term"></div><span>Term</span></button>
+      <button class="tool-btn" onclick="toggleFS()"><div class="tool-icon" id="icon-full"></div><span>Full</span></button>
+      <button class="tool-btn" onclick="reconnect()"><div class="tool-icon" id="icon-reset"></div><span>Reset</span></button>
+      <a href="/" class="tool-btn"><div class="tool-icon" id="icon-home"></div><span>Home</span></a>
+    </div>
+    <div class="quick-keys" id="quick-keys">
+      <button class="qk-btn" onclick="sendEsc()">Esc</button>
+      <button class="qk-btn" onclick="sendTab()">Tab</button>
+      <button class="qk-btn" onclick="sendCtrlC()">Ctrl+C</button>
+      <button class="qk-btn" onclick="sendCtrlV()">Ctrl+V</button>
+      <button class="qk-btn" onclick="sendSuper()">Super</button>
+      <button class="qk-btn" onclick="sendCtrlAltDel()">C+A+Del</button>
+    </div>
+    <div class="loading-overlay" id="loading">
+      <div id="loading-cube"></div>
+      <div class="loading-text">KuroMiru</div>
+      <div class="loading-sub">Connecting to Linux...</div>
+    </div>
+  </div>
+  <script type="module">
+    import { EtchedIcon } from '/shared/glass-cube.js';
+    import RFB from '/vncproxy/static/novnc/core/rfb.js';
+    
+    new EtchedIcon(document.getElementById('loading-cube'), 'cube', 100);
+    new EtchedIcon(document.getElementById('header-cube'), 'cube', 28);
+    new EtchedIcon(document.getElementById('icon-keys'), 'keyboard', 32);
+    new EtchedIcon(document.getElementById('icon-term'), 'terminal', 32);
+    new EtchedIcon(document.getElementById('icon-full'), 'expand', 32);
+    new EtchedIcon(document.getElementById('icon-reset'), 'refresh', 32);
+    new EtchedIcon(document.getElementById('icon-home'), 'home', 32);
+    
+    const screenWrap = document.getElementById('screen-wrap');
+    const screen = document.getElementById('screen');
+    const cursor = document.getElementById('cursor');
+    const loading = document.getElementById('loading');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const quickKeys = document.getElementById('quick-keys');
+    
+    let rfb = null;
+    
+    function connect() {
+      const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
+      const url = protocol + '://' + location.host + '/vncproxy/websockify';
+      
+      try {
+        rfb = new RFB(screen, url, {
+          credentials: { password: 'kuro' },
+          scaleViewport: true,
+          resizeSession: false,
+          clipViewport: true,
+          qualityLevel: 9,
+          compressionLevel: 0,
+          showDotCursor: false
+        });
+        
+        rfb.scaleViewport = true;
+        rfb.background = '#0a0010';
+        
+        rfb.addEventListener('connect', () => {
+          loading.classList.add('hidden');
+          statusDot.classList.add('connected');
+          statusText.textContent = 'Connected';
+          cursor.classList.add('visible');
+        });
+        
+        rfb.addEventListener('disconnect', () => {
+          statusDot.classList.remove('connected');
+          statusText.textContent = 'Disconnected';
+          cursor.classList.remove('visible');
+        });
+      } catch(e) {
+        console.error('RFB error:', e);
+        setTimeout(() => loading.classList.add('hidden'), 3000);
+      }
+    }
+    
+    setTimeout(() => loading.classList.add('hidden'), 8000);
+    
+    function updateCursor(x, y) {
+      cursor.style.left = x + 'px';
+      cursor.style.top = y + 'px';
+    }
+    
+    screenWrap.addEventListener('pointerdown', handlePointer, true);
+    screenWrap.addEventListener('pointermove', handlePointer, true);
+    screenWrap.addEventListener('pointerup', handlePointer, true);
+    
+    function handlePointer(e) {
+      const rect = screenWrap.getBoundingClientRect();
+      updateCursor(e.clientX - rect.left, e.clientY - rect.top);
+      if (e.type === 'pointerdown') createRipple(e.clientX - rect.left, e.clientY - rect.top);
+    }
+    
+    function createRipple(x, y) {
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      screenWrap.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 500);
+    }
+    
+    window.sendCtrlAltT = () => { if (!rfb) return; rfb.sendKey(0xFFE3, 'ControlLeft', true); rfb.sendKey(0xFFE9, 'AltLeft', true); rfb.sendKey(0x0074, 't', true); rfb.sendKey(0x0074, 't', false); rfb.sendKey(0xFFE9, 'AltLeft', false); rfb.sendKey(0xFFE3, 'ControlLeft', false); };
+    window.sendEsc = () => rfb?.sendKey(0xFF1B, 'Escape');
+    window.sendTab = () => rfb?.sendKey(0xFF09, 'Tab');
+    window.sendSuper = () => { rfb?.sendKey(0xFFEB, 'MetaLeft', true); rfb?.sendKey(0xFFEB, 'MetaLeft', false); };
+    window.sendCtrlAltDel = () => rfb?.sendCtrlAltDel();
+    window.sendCtrlC = () => { if(!rfb) return; rfb.sendKey(0xFFE3, 'ControlLeft', true); rfb.sendKey(0x0063, 'c', true); rfb.sendKey(0x0063, 'c', false); rfb.sendKey(0xFFE3, 'ControlLeft', false); };
+    window.sendCtrlV = () => { if(!rfb) return; rfb.sendKey(0xFFE3, 'ControlLeft', true); rfb.sendKey(0x0076, 'v', true); rfb.sendKey(0x0076, 'v', false); rfb.sendKey(0xFFE3, 'ControlLeft', false); };
+    window.toggleFS = () => { if (document.fullscreenElement || document.webkitFullscreenElement) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); } else { (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen).call(document.documentElement); } };
+    window.reconnect = () => { if (rfb) rfb.disconnect(); loading.classList.remove('hidden'); statusDot.classList.remove('connected'); cursor.classList.remove('visible'); setTimeout(connect, 300); };
+    window.toggleKeys = () => quickKeys.classList.toggle('visible');
+    
+    connect();
+  </script>
+</body>
+</html>

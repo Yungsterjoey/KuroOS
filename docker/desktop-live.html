@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KuroOS</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  background: linear-gradient(135deg, #0a0010 0%, #1a0030 50%, #0d0018 100%);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Animated background orbs */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: float 20s ease-in-out infinite;
+  pointer-events: none;
+}
+.bg-orb.purple { background: #7c3aed; width: 400px; height: 400px; top: 10%; left: 20%; }
+.bg-orb.blue { background: #3b82f6; width: 300px; height: 300px; bottom: 20%; right: 15%; animation-delay: -5s; }
+.bg-orb.pink { background: #ec4899; width: 250px; height: 250px; top: 50%; left: 60%; animation-delay: -10s; }
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* Top bar */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%);
+  border-bottom: 0.5px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 1000;
+}
+.topbar-left, .topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-logo { font-size: 13px; font-weight: 600; color: #a78bfa; display: flex; align-items: center; gap: 6px; }
+.topbar-menu { font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+.topbar-menu:hover { background: rgba(255,255,255,0.1); }
+.topbar-time { font-size: 13px; color: rgba(255,255,255,0.9); font-weight: 500; }
+.topbar-icons { display: flex; gap: 8px; font-size: 14px; }
+
+/* Desktop area */
+.desktop {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 80px);
+  grid-template-rows: repeat(auto-fill, 90px);
+  gap: 10px;
+  align-content: start;
+}
+
+/* Desktop icons */
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.desktop-icon:hover {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+}
+.desktop-icon:active { transform: scale(0.95); }
+.desktop-icon .icon {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+  border: 0.5px solid rgba(255,255,255,0.3);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.desktop-icon .label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-align: center;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dock */
+.dock-container {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+.dock {
+  display: flex;
+  gap: 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.12) 100%);
+  border: 0.5px solid rgba(255,255,255,0.4);
+  border-radius: 22px;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 
+    0 8px 32px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.25),
+    inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+.dock-item {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.08) 100%);
+  border: 0.5px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.dock-item:hover {
+  transform: translateY(-12px) scale(1.15);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.dock-item:active { transform: translateY(-8px) scale(1.08); }
+.dock-item.active::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+}
+.dock-separator {
+  width: 1px;
+  height: 40px;
+  background: rgba(255,255,255,0.2);
+  margin: 6px 4px;
+}
+
+/* Window */
+.window {
+  position: fixed;
+  background: linear-gradient(135deg, rgba(30,20,40,0.85) 0%, rgba(20,15,30,0.9) 100%);
+  border: 0.5px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  overflow: hidden;
+  display: none;
+  min-width: 400px;
+  min-height: 300px;
+}
+.window.active { display: block; z-index: 100; }
+.window-titlebar {
+  height: 36px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+  border-bottom: 0.5px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  cursor: grab;
+}
+.window-buttons { display: flex; gap: 8px; }
+.window-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+.window-btn.close { background: #ff5f57; }
+.window-btn.minimize { background: #ffbd2e; }
+.window-btn.maximize { background: #28ca41; }
+.window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+}
+.window-content {
+  padding: 16px;
+  color: rgba(255,255,255,0.9);
+  height: calc(100% - 36px);
+  overflow: auto;
+}
+
+/* Launcher overlay */
+.launcher {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.launcher.active { display: flex; }
+.launcher-content {
+  width: 600px;
+  max-height: 500px;
+}
+.launcher-search {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%);
+  border: 0.5px solid rgba(255,255,255,0.3);
+  border-radius: 16px;
+  font-size: 18px;
+  color: #fff;
+  outline: none;
+  backdrop-filter: blur(20px);
+  margin-bottom: 20px;
+}
+.launcher-search::placeholder { color: rgba(255,255,255,0.5); }
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.launcher-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.launcher-item:hover { background: rgba(255,255,255,0.1); }
+.launcher-item .icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
+  border: 0.5px solid rgba(255,255,255,0.3);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.launcher-item .label { font-size: 12px; color: rgba(255,255,255,0.9); }
+</style>
+</head>
+<body>
+<div class="bg-orb purple"></div>
+<div class="bg-orb blue"></div>
+<div class="bg-orb pink"></div>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">🧊 KuroOS</div>
+    <span class="topbar-menu">File</span>
+    <span class="topbar-menu">Edit</span>
+    <span class="topbar-menu">View</span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-icons">
+      <span>📶</span>
+      <span>🔋</span>
+    </div>
+    <div class="topbar-time" id="clock">00:00</div>
+  </div>
+</div>
+
+<div class="desktop">
+  <div class="desktop-icon" onclick="openApp(\"terminal\")">
+    <div class="icon">💻</div>
+    <div class="label">Terminal</div>
+  </div>
+  <div class="desktop-icon" onclick="openApp(\"browser\")">
+    <div class="icon">🌐</div>
+    <div class="label">Firefox</div>
+  </div>
+  <div class="desktop-icon" onclick="openApp(\"files\")">
+    <div class="icon">📁</div>
+    <div class="label">Files</div>
+  </div>
+  <div class="desktop-icon" onclick="openApp(\"notes\")">
+    <div class="icon">📝</div>
+    <div class="label">Notes</div>
+  </div>
+  <div class="desktop-icon" onclick="openApp(\"settings\")">
+    <div class="icon">⚙️</div>
+    <div class="label">Settings</div>
+  </div>
+</div>
+
+<div class="dock-container">
+  <div class="dock">
+    <div class="dock-item" onclick="toggleLauncher()">🧊</div>
+    <div class="dock-separator"></div>
+    <div class="dock-item" onclick="openApp(\"browser\")">🌐</div>
+    <div class="dock-item" onclick="openApp(\"terminal\")">💻</div>
+    <div class="dock-item" onclick="openApp(\"files\")">📁</div>
+    <div class="dock-item" onclick="openApp(\"notes\")">📝</div>
+    <div class="dock-separator"></div>
+    <div class="dock-item" onclick="openApp(\"settings\")">⚙️</div>
+  </div>
+</div>
+
+<div class="launcher" id="launcher" onclick="if(event.target===this)toggleLauncher()">
+  <div class="launcher-content">
+    <input type="text" class="launcher-search" placeholder="Search apps..." autofocus>
+    <div class="launcher-grid">
+      <div class="launcher-item" onclick="openApp(\"terminal\")"><div class="icon">💻</div><div class="label">Terminal</div></div>
+      <div class="launcher-item" onclick="openApp(\"browser\")"><div class="icon">🌐</div><div class="label">Firefox</div></div>
+      <div class="launcher-item" onclick="openApp(\"files\")"><div class="icon">📁</div><div class="label">Files</div></div>
+      <div class="launcher-item" onclick="openApp(\"notes\")"><div class="icon">📝</div><div class="label">Notes</div></div>
+      <div class="launcher-item" onclick="openApp(\"calc\")"><div class="icon">🔢</div><div class="label">Calculator</div></div>
+      <div class="launcher-item" onclick="openApp(\"settings\")"><div class="icon">⚙️</div><div class="label">Settings</div></div>
+      <div class="launcher-item" onclick="openApp(\"music\")"><div class="icon">🎵</div><div class="label">Music</div></div>
+      <div class="launcher-item" onclick="openApp(\"photos\")"><div class="icon">🖼️</div><div class="label">Photos</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="window" id="win-terminal" style="top:80px;left:100px;width:700px;height:450px;">
+  <div class="window-titlebar">
+    <div class="window-buttons">
+      <button class="window-btn close" onclick="closeWin(\"terminal\")"></button>
+      <button class="window-btn minimize"></button>
+      <button class="window-btn maximize"></button>
+    </div>
+    <div class="window-title">Terminal</div>
+  </div>
+  <div class="window-content" style="background:#0d0d0d;font-family:monospace;font-size:14px;padding:12px;">
+    <div style="color:#a78bfa;">kuro@glass</div><span style="color:#666;">:~$ </span><span id="term-cursor" style="animation:blink 1s infinite;">▊</span>
+  </div>
+</div>
+
+<script>
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById("clock").textContent = now.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Launcher
+function toggleLauncher() {
+  document.getElementById("launcher").classList.toggle("active");
+}
+
+// Apps - these trigger real X11 apps
+const apps = {
+  terminal: "lxterminal",
+  browser: "firefox",
+  files: "pcmanfm",
+  notes: "mousepad",
+  calc: "galculator",
+  settings: "lxappearance"
+};
+
+function openApp(name) {
+  toggleLauncher();
+  // Use Python to launch - injected by parent
+  if (window.launchApp) {
+    window.launchApp(apps[name] || name);
+  } else {
+    console.log("Launch:", apps[name]);
+  }
+}
+
+function closeWin(name) {
+  document.getElementById("win-" + name).classList.remove("active");
+}
+
+// Keyboard shortcut
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") toggleLauncher();
+  if (e.metaKey && e.key === " ") { e.preventDefault(); toggleLauncher(); }
+});
+
+// Make windows draggable
+document.querySelectorAll(".window-titlebar").forEach(tb => {
+  tb.addEventListener("mousedown", (e) => {
+    const win = tb.parentElement;
+    const startX = e.clientX - win.offsetLeft;
+    const startY = e.clientY - win.offsetTop;
+    function drag(e) {
+      win.style.left = (e.clientX - startX) + "px";
+      win.style.top = (e.clientY - startY) + "px";
+    }
+    function stop() {
+      document.removeEventListener("mousemove", drag);
+      document.removeEventListener("mouseup", stop);
+    }
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stop);
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+feh --bg-fill /usr/share/backgrounds/kuroos/wallpaper.svg &
+python3 /opt/kuroos/launcher.py &
+sleep 2
+firefox --kiosk http://127.0.0.1:9999/desktop.html &

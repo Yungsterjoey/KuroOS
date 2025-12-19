@@ -1,0 +1,49 @@
+# LiquidGlass Openbox Theme
+
+# Window borders
+border.width: 1
+border.color: #3d2a5c
+padding.width: 8
+padding.height: 6
+
+# Title bar
+window.active.title.bg: flat gradient vertical
+window.active.title.bg.color: #1a0030
+window.active.title.bg.colorTo: #0a0010
+window.active.title.bg.border.color: #3d2a5c
+window.active.label.text.color: #a78bfa
+window.active.label.text.font: shadow=y:shadowoffset=1:shadowtint=70
+
+window.inactive.title.bg: flat gradient vertical
+window.inactive.title.bg.color: #0d0018
+window.inactive.title.bg.colorTo: #0a0010
+window.inactive.label.text.color: #555555
+
+# Window buttons
+window.active.button.unpressed.bg: flat gradient vertical
+window.active.button.unpressed.bg.color: #2a1845
+window.active.button.unpressed.bg.colorTo: #1a0030
+window.active.button.unpressed.image.color: #a78bfa
+
+window.active.button.hover.bg: flat gradient vertical
+window.active.button.hover.bg.color: #3d2a5c
+window.active.button.hover.bg.colorTo: #2a1845
+window.active.button.hover.image.color: #ffffff
+
+# Handle and grip
+window.handle.width: 0
+window.grip.width: 0
+
+# Menu
+menu.border.width: 1
+menu.border.color: #3d2a5c
+menu.title.bg: flat gradient vertical
+menu.title.bg.color: #1a0030
+menu.title.bg.colorTo: #0a0010
+menu.title.text.color: #a78bfa
+menu.items.bg: flat solid
+menu.items.bg.color: #0a0010
+menu.items.text.color: #ffffff
+menu.items.active.bg: flat solid
+menu.items.active.bg.color: #2a1845
+menu.items.active.text.color: #ffffff

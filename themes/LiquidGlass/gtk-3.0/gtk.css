@@ -1,0 +1,67 @@
+/* KuroOS Liquid Glass GTK3 Theme */
+* {
+    background-color: #0a0010;
+    color: #e0d0ff;
+    border-color: #3d2a5c;
+}
+
+window, .background {
+    background-color: #0a0010;
+}
+
+headerbar, .titlebar {
+    background: linear-gradient(to bottom, #1a0030, #0a0010);
+    border-bottom: 1px solid #3d2a5c;
+    color: #a78bfa;
+}
+
+button {
+    background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid #3d2a5c;
+    border-radius: 8px;
+    color: #e0d0ff;
+    padding: 6px 12px;
+}
+
+button:hover {
+    background: #2a1845;
+}
+
+entry, textview, .view, treeview, iconview {
+    background-color: #0d0018;
+    color: #ffffff;
+    border: 1px solid #3d2a5c;
+    border-radius: 6px;
+}
+
+*:selected {
+    background-color: #a78bfa;
+    color: #0a0010;
+}
+
+scrollbar {
+    background: #0a0010;
+}
+
+scrollbar slider {
+    background: #3d2a5c;
+    border-radius: 4px;
+    min-width: 8px;
+}
+
+menu, .menu, .popup, popover {
+    background: #0a0010;
+    border: 1px solid #3d2a5c;
+    border-radius: 8px;
+}
+
+menuitem:hover {
+    background: #2a1845;
+}
+
+tooltip {
+    background: #1a0030;
+    border: 1px solid #3d2a5c;
+    border-radius: 6px;
+    color: #e0d0ff;
+}
